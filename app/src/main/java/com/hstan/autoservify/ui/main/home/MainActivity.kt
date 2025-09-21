@@ -19,11 +19,15 @@ import com.google.android.material.navigation.NavigationView
 import com.hstan.autoservify.R
 import com.hstan.autoservify.ui.auth.LoginActivity
 import com.hstan.autoservify.ui.main.ViewModels.MainViewModel
+import com.hstan.autoservify.ui.main.Shops.Services.ServicesActivity
+import com.hstan.autoservify.ui.main.Shops.SpareParts.PartsCraftActivity
+import com.hstan.autoservify.model.repositories.AuthRepository
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     private val viewModel: MainViewModel by viewModels()
+    private var currentUserType: String = "customer"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +55,12 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNavigationView.setupWithNavController(navHostFragment.navController)
+        
+        // Setup custom navigation for shopkeepers
+        setupShopkeeperNavigation(bottomNavigationView)
+        
+        // Get user type
+        checkUserType()
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -102,5 +112,66 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
         val alert = dialogBuilder.create()
         alert.show()
+    }
+
+    private fun checkUserType() {
+        lifecycleScope.launch {
+            val authRepository = AuthRepository()
+            val currentUser = authRepository.getCurrentUser()
+            
+            if (currentUser != null) {
+                val result = authRepository.getUserProfile(currentUser.uid)
+                if (result.isSuccess) {
+                    val userProfile = result.getOrThrow()
+                    currentUserType = userProfile.userType
+                }
+            }
+        }
+    }
+
+    private fun setupShopkeeperNavigation(bottomNavigationView: BottomNavigationView) {
+        bottomNavigationView.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.item_home -> {
+                    // Home navigation (works for both)
+                    val navHostFragment = supportFragmentManager
+                        .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+                    navHostFragment.navController.navigate(R.id.item_home)
+                    true
+                }
+                R.id.item_search -> {
+                    if (currentUserType == "shop_owner") {
+                        // For shopkeepers: Search -> PartsCraft (Spare Parts)
+                        startActivity(Intent(this, PartsCraftActivity::class.java))
+                    } else {
+                        // For customers: Search -> Search Fragment
+                        val navHostFragment = supportFragmentManager
+                            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+                        navHostFragment.navController.navigate(R.id.item_search)
+                    }
+                    true
+                }
+                R.id.item_cart -> {
+                    if (currentUserType == "shop_owner") {
+                        // For shopkeepers: Orders -> Services
+                        startActivity(Intent(this, ServicesActivity::class.java))
+                    } else {
+                        // For customers: Orders -> Orders Fragment  
+                        val navHostFragment = supportFragmentManager
+                            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+                        navHostFragment.navController.navigate(R.id.item_cart)
+                    }
+                    true
+                }
+                R.id.item_profile -> {
+                    // Profile navigation (works for both - keep as is)
+                    val navHostFragment = supportFragmentManager
+                        .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+                    navHostFragment.navController.navigate(R.id.item_profile)
+                    true
+                }
+                else -> false
+            }
+        }
     }
 }

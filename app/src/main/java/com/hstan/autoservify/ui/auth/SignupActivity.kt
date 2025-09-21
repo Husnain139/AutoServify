@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.hstan.autoservify.databinding.ActivitySignupBinding
 import com.hstan.autoservify.ui.main.home.MainActivity
+import com.hstan.autoservify.ui.main.Shops.AddShopActivity
 import com.hstan.autoservify.model.AppUser
 import com.hstan.autoservify.model.repositories.AuthRepository
 import com.google.firebase.auth.FirebaseUser
@@ -42,9 +43,7 @@ class SignupActivity : AppCompatActivity() {
                 if (user != null) {
                     hideLoading()
                     // Save user profile after successful signup
-                    saveUserProfile(user)
-                    startActivity(Intent(this@SignupActivity, MainActivity::class.java))
-                    finish()
+                    saveUserProfileAndNavigate(user)
                 }
             }
         }
@@ -91,7 +90,7 @@ class SignupActivity : AppCompatActivity() {
         binding.loadingOverlay.visibility = View.GONE
     }
 
-    private fun saveUserProfile(user: FirebaseUser) {
+    private fun saveUserProfileAndNavigate(user: FirebaseUser) {
         lifecycleScope.launch {
             val authRepository = AuthRepository()
             val selectedUserType = getSelectedUserType()
@@ -104,7 +103,20 @@ class SignupActivity : AppCompatActivity() {
             )
             
             val result = authRepository.saveUserProfile(userProfile)
-            if (result.isFailure) {
+            if (result.isSuccess) {
+                // Navigate based on user type
+                when (selectedUserType) {
+                    "shop_owner" -> {
+                        // New shopkeeper - go to AddShop
+                        startActivity(Intent(this@SignupActivity, AddShopActivity::class.java))
+                    }
+                    else -> {
+                        // Customer - go to MainActivity
+                        startActivity(Intent(this@SignupActivity, MainActivity::class.java))
+                    }
+                }
+                finish()
+            } else {
                 Toast.makeText(this@SignupActivity, "Profile creation failed", Toast.LENGTH_SHORT).show()
             }
         }

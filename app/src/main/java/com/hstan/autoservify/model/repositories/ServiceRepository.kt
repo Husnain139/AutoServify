@@ -27,6 +27,15 @@ class ServiceRepository {
         }
     }
 
+    suspend fun getServicesByShopId(shopId: String): List<Service> {
+        return try {
+            val snapshot = serviceCollection.whereEqualTo("shopId", shopId).get().await()
+            snapshot.toObjects(Service::class.java)
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
     //  New: Get single service by ID
     suspend fun getServiceById(serviceId: String): Service? {
         return try {

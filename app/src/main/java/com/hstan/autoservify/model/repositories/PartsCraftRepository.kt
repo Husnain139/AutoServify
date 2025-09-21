@@ -24,6 +24,9 @@ class PartsCraftRepository {
     fun getPartsCrafts() =
         PartsCraftCollection.snapshots().map { it.toObjects(PartsCraft::class.java) }
 
+    fun getPartsCraftsByShopId(shopId: String) =
+        PartsCraftCollection.whereEqualTo("shopId", shopId).snapshots().map { it.toObjects(PartsCraft::class.java) }
+
     suspend fun deletePartsCraft(partId: String): Result<Boolean> {
         return try {
             PartsCraftCollection.document(partId).delete().await()

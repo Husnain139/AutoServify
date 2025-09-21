@@ -10,6 +10,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import com.hstan.autoservify.R
+import com.hstan.autoservify.model.repositories.AuthRepository
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 class Add_Service_Activity : AppCompatActivity() {
 
@@ -60,15 +63,33 @@ class Add_Service_Activity : AppCompatActivity() {
                 )
                 viewModel.updateService(updatedService)
             } else {
-                // Create new service
-                val service = Service(
-                    id = FirebaseFirestore.getInstance().collection("services").document().id,
-                    name = name.text.toString(),
-                    description = desc.text.toString(),
-                    price = price.text.toString().toDoubleOrNull() ?: 0.0,
-                    rating = 0.0
-                )
-                viewModel.addService(service)
+                // Create new service - get shopId from user profile
+                lifecycleScope.launch {
+                    val authRepository = AuthRepository()
+                    val currentUser = authRepository.getCurrentUser()
+                    
+                    if (currentUser != null) {
+                        val result = authRepository.getUserProfile(currentUser.uid)
+                        if (result.isSuccess) {
+                            val userProfile = result.getOrThrow()
+                            val shopId = userProfile.shopId ?: ""
+                            
+                            val service = Service(
+                                id = FirebaseFirestore.getInstance().collection("services").document().id,
+                                name = name.text.toString(),
+                                description = desc.text.toString(),
+                                price = price.text.toString().toDoubleOrNull() ?: 0.0,
+                                rating = 0.0,
+                                shopId = shopId
+                            )
+                            viewModel.addService(service)
+                        } else {
+                            Toast.makeText(this@Add_Service_Activity, "Unable to get user profile", Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        Toast.makeText(this@Add_Service_Activity, "Please login first", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
         }
 

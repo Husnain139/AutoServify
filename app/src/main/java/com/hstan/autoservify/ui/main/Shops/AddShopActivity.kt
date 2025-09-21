@@ -6,8 +6,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.hstan.autoservify.databinding.ActivityAddShopBinding
 import com.hstan.autoservify.ui.main.Shops.Shop
+import com.hstan.autoservify.ui.main.home.MainActivity
 import com.hstan.autoservify.model.repositories.AuthRepository
 import kotlinx.coroutines.launch
+import android.content.Intent
 
 class AddShopActivity : AppCompatActivity() {
 
@@ -26,6 +28,8 @@ class AddShopActivity : AppCompatActivity() {
                 it?.let {
                     if (it) {
                         Toast.makeText(this@AddShopActivity, "Shop added successfully!", Toast.LENGTH_SHORT).show()
+                        // Navigate to MainActivity to show dashboard
+                        startActivity(Intent(this@AddShopActivity, MainActivity::class.java))
                         finish()
                     }
                 }
