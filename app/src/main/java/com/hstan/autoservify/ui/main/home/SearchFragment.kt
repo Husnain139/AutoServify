@@ -60,9 +60,15 @@ class SearchFragment : Fragment() {
     private fun setupSearchFunctionality() {
         binding.searchEditText.addTextChangedListener { text ->
             searchJob?.cancel()
-            searchJob = lifecycleScope.launch {
-                delay(300) // Debounce search
-                performSearch(text.toString().trim())
+            searchJob = viewLifecycleOwner.lifecycleScope.launch {
+                try {
+                    delay(300) // Debounce search
+                    if (isAdded && _binding != null) {
+                        performSearch(text.toString().trim())
+                    }
+                } catch (e: Exception) {
+                    println("SearchFragment: Search functionality error: ${e.message}")
+                }
             }
         }
     }
@@ -112,44 +118,66 @@ class SearchFragment : Fragment() {
     }
 
     private fun performSearch(query: String) {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
+                if (!isAdded || _binding == null) {
+                    println("SearchFragment: Fragment not ready for search")
+                    return@launch
+                }
+                
                 if (query.isEmpty()) {
                     loadAllShops()
                 } else {
                     searchShops(query)
                 }
             } catch (e: Exception) {
-                Toast.makeText(context, "Search failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                println("SearchFragment: Search failed: ${e.message}")
+                if (isAdded && context != null) {
+                    Toast.makeText(context, "Search failed: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
 
     private fun loadAllShops() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
+                if (!isAdded || _binding == null) return@launch
+                
                 shopRepository.getShops().collect { shops ->
-                    updateResults(shops)
+                    if (isAdded && _binding != null) {
+                        updateResults(shops)
+                    }
                 }
             } catch (e: Exception) {
-                updateResults(emptyList())
+                println("SearchFragment: Error loading shops: ${e.message}")
+                if (isAdded && _binding != null) {
+                    updateResults(emptyList())
+                }
             }
         }
     }
 
     private fun searchShops(query: String) {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
+                if (!isAdded || _binding == null) return@launch
+                
                 shopRepository.getShops().collect { allShops ->
-                    val filteredShops = allShops.filter { shop ->
-                        shop.title.contains(query, ignoreCase = true) ||
-                        shop.description.contains(query, ignoreCase = true) ||
-                        shop.address.contains(query, ignoreCase = true)
+                    if (isAdded && _binding != null) {
+                        val filteredShops = allShops.filter { shop ->
+                            shop.title.contains(query, ignoreCase = true) ||
+                            shop.description.contains(query, ignoreCase = true) ||
+                            shop.address.contains(query, ignoreCase = true)
+                        }
+                        updateResults(filteredShops)
                     }
-                    updateResults(filteredShops)
                 }
             } catch (e: Exception) {
-                updateResults(emptyList())
+                println("SearchFragment: Error searching shops: ${e.message}")
+                if (isAdded && _binding != null) {
+                    updateResults(emptyList())
+                }
             }
         }
     }
@@ -171,7 +199,21 @@ class SearchFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        println("SearchFragment: onDestroyView called")
         searchJob?.cancel()
+        println("SearchFragment: Search job cancelled")
         _binding = null
+    }
+
+    override fun onPause() {
+        super.onPause()
+        println("SearchFragment: onPause called")
+        // Cancel any ongoing searches when leaving the fragment
+        searchJob?.cancel()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        println("SearchFragment: onResume called")
     }
 }

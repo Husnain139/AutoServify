@@ -20,18 +20,41 @@ class PartsCraftActivity : AppCompatActivity() {
 
     private lateinit var adapter: PartsCraftAdapter
     private lateinit var viewModel: PartsCraftViewModel
+    private var specificShopId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_partscraft)
 
+        // Check if we're viewing parts for a specific shop
+        specificShopId = intent.getStringExtra("shop_id")
+        val shopName = intent.getStringExtra("shop_name")
+        
+        // Update title if we're viewing a specific shop
+        if (!specificShopId.isNullOrEmpty() && !shopName.isNullOrEmpty()) {
+            title = "$shopName - Spare Parts"
+            println("PartsCraftActivity: Viewing parts for shop: $specificShopId ($shopName)")
+        } else {
+            println("PartsCraftActivity: Viewing all parts")
+        }
+
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
         
-        // Initialize adapter immediately with default values
+        // Initialize adapter immediately with default values and click listeners
         adapter = PartsCraftAdapter(
             items = mutableListOf(),
-            showEditDeleteButtons = false // Default to customer view
+            showEditDeleteButtons = false, // Default to customer view
+            onEditClick = { partsCraft ->
+                // Navigate to edit activity
+                val intent = Intent(this, Addpartscraft::class.java)
+                intent.putExtra("partsCraftData", Gson().toJson(partsCraft))
+                startActivity(intent)
+            },
+            onDeleteClick = { partsCraft ->
+                // Show delete confirmation dialog
+                showDeleteConfirmationDialog(partsCraft)
+            }
         )
         recyclerView.adapter = adapter
         
@@ -69,8 +92,8 @@ class PartsCraftActivity : AppCompatActivity() {
             }
         }
 
-        // Load data
-        viewModel.loadPartsCrafts()
+        // Load data based on user role
+        loadDataBasedOnUserRole()
 
         // Add new spare part
         // Setup Add button based on user role
@@ -133,5 +156,53 @@ class PartsCraftActivity : AppCompatActivity() {
             }
             .setNegativeButton("Cancel", null)
             .show()
+    }
+
+    // 🆕 Load data based on user role (role-based access control)
+    private fun loadDataBasedOnUserRole() {
+        lifecycleScope.launch {
+            val authRepository = AuthRepository()
+            val currentUser = authRepository.getCurrentUser()
+            
+            // If a specific shop ID is provided, load parts for that shop only
+            if (!specificShopId.isNullOrEmpty()) {
+                println("Loading parts for specific shop: $specificShopId")
+                viewModel.loadPartsCraftsByShopId(specificShopId!!)
+                return@launch
+            }
+            
+            if (currentUser != null) {
+                val result = authRepository.getUserProfile(currentUser.uid)
+                if (result.isSuccess) {
+                    val userProfile = result.getOrThrow()
+                    when (userProfile.userType) {
+                        "shop_owner" -> {
+                            // Shop owner should only see their own parts
+                            val shopId = userProfile.shopId
+                            if (!shopId.isNullOrEmpty()) {
+                                println("Loading parts for shop owner's shop: $shopId")
+                                viewModel.loadPartsCraftsByShopId(shopId)
+                            } else {
+                                println("Shop owner with no shopId, loading all parts")
+                                viewModel.loadPartsCrafts()
+                            }
+                        }
+                        else -> {
+                            // Customer should see all parts from all shops (only when not viewing specific shop)
+                            println("Loading all parts for customer")
+                            viewModel.loadPartsCrafts()
+                        }
+                    }
+                } else {
+                    // Profile not found, load all parts
+                    println("Profile not found, loading all parts")
+                    viewModel.loadPartsCrafts()
+                }
+            } else {
+                // No user logged in, load all parts
+                println("No user logged in, loading all parts")
+                viewModel.loadPartsCrafts()
+            }
+        }
     }
 }

@@ -38,6 +38,21 @@ class PartsCraftViewModel : ViewModel() {
         }
     }
 
+    // 🆕 Load parts for a specific shop (role-based access)
+    fun loadPartsCraftsByShopId(shopId: String) {
+        viewModelScope.launch {
+            try {
+                repository.getPartsCraftsByShopId(shopId).collect { partsCraftsList ->
+                    _partsCrafts.value = partsCraftsList
+                }
+            } catch (e: Exception) {
+                // Handle error
+                _partsCrafts.value = emptyList()
+                _failureMessage.value = e.message
+            }
+        }
+    }
+
     fun deletePartsCraft(partId: String) {
         viewModelScope.launch {
             val result = repository.deletePartsCraft(partId)

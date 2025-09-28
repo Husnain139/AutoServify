@@ -25,12 +25,23 @@ class AuthViewModel: ViewModel() {
 
     fun login(email: String, password: String) {
         viewModelScope.launch {
-            val result = authRepository.login(email, password)
-            if (result.isSuccess) {
-                _currentUser.value = result.getOrThrow()
-                fetchUserName()
-            } else {
-                failureMessage.value = result.exceptionOrNull()?.message
+            try {
+                println("AuthViewModel: Attempting login for email: $email")
+                val result = authRepository.login(email, password)
+                if (result.isSuccess) {
+                    val user = result.getOrThrow()
+                    println("AuthViewModel: Login successful for user: ${user.uid}")
+                    _currentUser.value = user
+                    fetchUserName()
+                } else {
+                    val error = result.exceptionOrNull()?.message ?: "Unknown login error"
+                    println("AuthViewModel: Login failed with error: $error")
+                    failureMessage.value = error
+                }
+            } catch (e: Exception) {
+                println("AuthViewModel: Login exception: ${e.message}")
+                e.printStackTrace()
+                failureMessage.value = "Login failed: ${e.message}"
             }
         }
     }
@@ -60,8 +71,10 @@ class AuthViewModel: ViewModel() {
     }
 
     fun checkUser() {
-        _currentUser.value = authRepository.getCurrentUser()
-        if (_currentUser.value != null) {
+        val user = authRepository.getCurrentUser()
+        println("AuthViewModel: checkUser() - Found user: ${user?.uid}")
+        _currentUser.value = user
+        if (user != null) {
             fetchUserName()
         }
     }
@@ -71,6 +84,13 @@ class AuthViewModel: ViewModel() {
         if (user != null) {
             _userName.value = user.displayName ?: "Unknown"
         }
+    }
+
+    // 🆕 Clear user state (for debugging)
+    fun clearUserState() {
+        _currentUser.value = null
+        _userName.value = ""
+        failureMessage.value = null
     }
 }
 

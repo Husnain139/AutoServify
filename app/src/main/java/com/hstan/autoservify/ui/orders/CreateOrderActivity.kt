@@ -11,7 +11,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.gson.Gson
 import com.hstan.autoservify.databinding.ActivityCreateOrderBinding
 import com.hstan.autoservify.model.repositories.OrderRepository
-import com.hstan.autoservify.ui.Order
+import com.hstan.autoservify.ui.main.ViewModels.Order
 import com.hstan.autoservify.ui.main.Shops.SpareParts.PartsCraft
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat

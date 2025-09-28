@@ -1,4 +1,4 @@
-package com.hstan.autoservify.ui
+package com.hstan.autoservify.ui.main.ViewModels
 
 import com.hstan.autoservify.ui.main.Shops.SpareParts.PartsCraft
 

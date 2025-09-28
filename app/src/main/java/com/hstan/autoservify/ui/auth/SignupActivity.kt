@@ -111,8 +111,8 @@ class SignupActivity : AppCompatActivity() {
                         startActivity(Intent(this@SignupActivity, AddShopActivity::class.java))
                     }
                     else -> {
-                        // Customer - go to MainActivity
-                        startActivity(Intent(this@SignupActivity, MainActivity::class.java))
+                        // Customer - go to CustomerMainActivity
+                        startActivity(Intent(this@SignupActivity, com.hstan.autoservify.ui.customer.CustomerMainActivity::class.java))
                     }
                 }
                 finish()

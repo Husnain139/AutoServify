@@ -20,6 +20,7 @@ import com.hstan.autoservify.ui.main.Shops.SpareParts.PartsCraftActivity
 class ShopActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
     lateinit var binding: ActivityShopBinding
+    private var currentShop: Shop? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +32,7 @@ class ShopActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         // Fill title and description from intent JSON
         intent.getStringExtra("data")?.let { json ->
             val shop = Gson().fromJson(json, Shop::class.java)
+            currentShop = shop // Store the shop for later use
             binding.titleInput.text = shop.title
             binding.descriptionInput.text = shop.description
         }
@@ -50,21 +52,41 @@ class ShopActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         // ✅ Open Services page when clicking the card
         binding.servicesCard.setOnClickListener {
-            startActivity(Intent(this, ServicesActivity::class.java))
+            val intent = Intent(this, ServicesActivity::class.java)
+            currentShop?.let { shop ->
+                intent.putExtra("shop_id", shop.id)
+                intent.putExtra("shop_name", shop.title)
+            }
+            startActivity(intent)
         }
 
         // ✅ Open Services page when clicking arrow inside card
         binding.ServicePage.setOnClickListener {
-            startActivity(Intent(this, ServicesActivity::class.java))
+            val intent = Intent(this, ServicesActivity::class.java)
+            currentShop?.let { shop ->
+                intent.putExtra("shop_id", shop.id)
+                intent.putExtra("shop_name", shop.title)
+            }
+            startActivity(intent)
         }
 
         // ✅ Spare Parts card and arrow
         binding.sparePartsCard.setOnClickListener {
-            startActivity(Intent(this, PartsCraftActivity::class.java))
+            val intent = Intent(this, PartsCraftActivity::class.java)
+            currentShop?.let { shop ->
+                intent.putExtra("shop_id", shop.id)
+                intent.putExtra("shop_name", shop.title)
+            }
+            startActivity(intent)
         }
 
         binding.SparePartsPage.setOnClickListener {
-            startActivity(Intent(this, PartsCraftActivity::class.java))
+            val intent = Intent(this, PartsCraftActivity::class.java)
+            currentShop?.let { shop ->
+                intent.putExtra("shop_id", shop.id)
+                intent.putExtra("shop_name", shop.title)
+            }
+            startActivity(intent)
         }
     }
 

@@ -58,11 +58,29 @@
         <activity
             android:name=".ui.auth.SignupActivity"
             android:exported="false" />
+        <!-- Customer Activity -->
         <activity
-            android:name=".ui.auth.LoginActivity"
-            android:exported="false" /> <!-- Launcher -->
+            android:name=".ui.customer.CustomerMainActivity"
+            android:exported="false" />
+        <!-- Shopkeeper Activity -->
+        <activity
+            android:name=".ui.shopkeeper.ShopkeeperMainActivity"
+            android:exported="false" />
+        <!-- Shopkeeper Orders Activity -->
+        <activity
+            android:name=".ui.shopkeeper.OrdersActivity"
+            android:exported="false" />
+        <!-- Shopkeeper Appointments Activity -->
+        <activity
+            android:name=".ui.shopkeeper.AppointmentsActivity"
+            android:exported="false" />
+        <!-- Main Activity (Splash/Redirect) -->
         <activity
             android:name=".ui.main.home.MainActivity"
+            android:exported="false" />
+        <!-- Launcher -->
+        <activity
+            android:name=".ui.auth.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

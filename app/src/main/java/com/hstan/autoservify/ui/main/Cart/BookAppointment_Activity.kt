@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.hstan.autoservify.databinding.ActivityBookAppointmentBinding
 import com.hstan.autoservify.ui.main.Shops.Services.Appointment
+import com.hstan.autoservify.model.repositories.ServiceRepository
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -21,8 +22,10 @@ class BookAppointment_Activity : AppCompatActivity() {
 
     private var serviceId: String = ""
     private var serviceName: String = ""
+    private var shopId: String = "" // 🆕 Store shopId from service
     private lateinit var progressDialog: ProgressDialog
     private val calendar = Calendar.getInstance()
+    private val serviceRepository = ServiceRepository() // 🆕 For fetching service details
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +35,9 @@ class BookAppointment_Activity : AppCompatActivity() {
         // ✅ Get service info from intent
         serviceId = intent.getStringExtra("service_id") ?: ""
         serviceName = intent.getStringExtra("service_name") ?: ""
+        
+        // 🆕 Fetch service details to get shopId
+        fetchServiceDetails()
 
         // ✅ Setup ProgressDialog
         progressDialog = ProgressDialog(this).apply {
@@ -73,7 +79,8 @@ class BookAppointment_Activity : AppCompatActivity() {
                 appointmentTime = time,
                 status = "Pending",
                 serviceId = serviceId,
-                serviceName = serviceName
+                serviceName = serviceName,
+                shopId = shopId // 🆕 Include shopId from service
             )
 
             viewModel.saveAppointment(appointment)
@@ -158,5 +165,24 @@ class BookAppointment_Activity : AppCompatActivity() {
             false // false → 12h format with AM/PM
         )
         timePicker.show()
+    }
+
+    // 🆕 Fetch service details to get shopId
+    private fun fetchServiceDetails() {
+        lifecycleScope.launch {
+            try {
+                val service = serviceRepository.getServiceById(serviceId)
+                if (service != null) {
+                    shopId = service.shopId
+                    println("Fetched shopId for service: $shopId")
+                } else {
+                    println("Service not found for ID: $serviceId")
+                    Toast.makeText(this@BookAppointment_Activity, "Service not found", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                println("Error fetching service details: ${e.message}")
+                Toast.makeText(this@BookAppointment_Activity, "Error loading service details", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 }

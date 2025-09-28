@@ -1,6 +1,7 @@
 package com.hstan.autoservify.model.repositories
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.hstan.autoservify.ui.main.Shops.Services.Service
 import kotlinx.coroutines.tasks.await
 
@@ -65,6 +66,21 @@ class ServiceRepository {
             } ?: false
         } catch (e: Exception) {
             false
+        }
+    }
+
+    // 🆕 Get recent services for a specific shop (for dashboard)
+    suspend fun getRecentServicesByShopId(shopId: String, limit: Int = 3): List<Service> {
+        return try {
+            val snapshot = serviceCollection
+                .whereEqualTo("shopId", shopId)
+                .orderBy("id", Query.Direction.DESCENDING)
+                .limit(limit.toLong())
+                .get()
+                .await()
+            snapshot.toObjects(Service::class.java)
+        } catch (e: Exception) {
+            emptyList()
         }
     }
 }

@@ -28,8 +28,8 @@ class AddShopActivity : AppCompatActivity() {
                 it?.let {
                     if (it) {
                         Toast.makeText(this@AddShopActivity, "Shop added successfully!", Toast.LENGTH_SHORT).show()
-                        // Navigate to MainActivity to show dashboard
-                        startActivity(Intent(this@AddShopActivity, MainActivity::class.java))
+                        // Navigate to ShopkeeperMainActivity to show dashboard
+                        startActivity(Intent(this@AddShopActivity, com.hstan.autoservify.ui.shopkeeper.ShopkeeperMainActivity::class.java))
                         finish()
                     }
                 }

@@ -1,6 +1,7 @@
 package com.hstan.autoservify.model.repositories
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.snapshots
 import com.hstan.autoservify.ui.main.Shops.SpareParts.PartsCraft
 import kotlinx.coroutines.flow.map
@@ -46,4 +47,13 @@ class PartsCraftRepository {
             Result.failure(e)
         }
     }
+
+    // 🆕 Get recent spare parts for a specific shop (for dashboard)
+    fun getRecentPartsCraftsByShopId(shopId: String, limit: Int = 3) =
+        PartsCraftCollection
+            .whereEqualTo("shopId", shopId)
+            .orderBy("id", Query.Direction.DESCENDING)
+            .limit(limit.toLong())
+            .snapshots()
+            .map { it.toObjects(PartsCraft::class.java) }
 }

@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.hstan.autoservify.R
 import com.hstan.autoservify.databinding.ItemOrderBinding
-import com.hstan.autoservify.ui.Order
+import com.hstan.autoservify.ui.main.ViewModels.Order
 import com.hstan.autoservify.ui.main.Shops.Services.Appointment
 
 class OrderAdapter(
@@ -30,11 +30,11 @@ class OrderAdapter(
     }
 
     private fun bindOrder(holder: OrderViewHolder, order: Order) {
-        holder.binding.orderItemTitle.text = order.item?.title ?: "Item"
+        holder.binding.orderItemTitle.text = order.item?.title ?: "Unknown Item"
         holder.binding.orderQty.text = "Qty: ${order.quantity}"
         holder.binding.orderPrice.text = "Rs. ${order.item?.price ?: 0}"
         holder.binding.orderStatus.text = order.status.ifBlank { "pending" }
-        holder.binding.orderDate.text = order.orderDate
+        holder.binding.orderDate.text = order.orderDate.ifBlank { "No date" }
 
         Glide.with(holder.itemView.context)
             .load(order.item?.image)
@@ -66,7 +66,12 @@ class OrderAdapter(
     }
 
     fun updateData(newItems: List<Any>) {
-        items = newItems
-        notifyDataSetChanged()
+        try {
+            items = newItems.toList() // Create a defensive copy
+            notifyDataSetChanged()
+        } catch (e: Exception) {
+            println("Error updating adapter data: ${e.message}")
+            e.printStackTrace()
+        }
     }
 }

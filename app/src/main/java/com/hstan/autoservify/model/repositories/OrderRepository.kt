@@ -2,7 +2,7 @@ package com.hstan.autoservify.model.repositories
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.snapshots
-import com.hstan.autoservify.ui.Order
+import com.hstan.autoservify.ui.main.ViewModels.Order
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 

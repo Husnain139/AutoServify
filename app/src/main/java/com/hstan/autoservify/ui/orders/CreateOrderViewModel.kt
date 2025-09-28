@@ -3,7 +3,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hstan.autoservify.model.repositories.AuthRepository
 import com.hstan.autoservify.model.repositories.OrderRepository
-import com.hstan.autoservify.ui.Order
+import com.hstan.autoservify.ui.main.ViewModels.Order
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 

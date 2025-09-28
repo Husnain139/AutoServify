@@ -18,9 +18,19 @@ class AuthRepository {
 
     suspend fun login(email: String, password: String): Result<FirebaseUser> {
         try {
+            println("AuthRepository: Starting login for email: $email")
             val result = FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password).await()
-            return Result.success(result.user!!)
+            val user = result.user
+            if (user != null) {
+                println("AuthRepository: Login successful, user: ${user.uid}")
+                return Result.success(user)
+            } else {
+                println("AuthRepository: Login result was null")
+                return Result.failure(Exception("Authentication failed - user is null"))
+            }
         } catch (e: Exception) {
+            println("AuthRepository: Login exception: ${e.message}")
+            e.printStackTrace()
             return Result.failure(e)
         }
     }
@@ -66,10 +76,21 @@ class AuthRepository {
 
     suspend fun getUserProfile(uid: String): Result<AppUser> {
         return try {
+            println("AuthRepository: Getting user profile for UID: $uid")
             val doc = db.collection("users").document(uid).get().await()
-            val user = doc.toObject(AppUser::class.java) ?: AppUser()
-            Result.success(user)
+            if (doc.exists()) {
+                val user = doc.toObject(AppUser::class.java) ?: AppUser()
+                println("AuthRepository: User profile found - Type: ${user.userType}")
+                Result.success(user)
+            } else {
+                println("AuthRepository: User profile document does not exist")
+                // Create a default customer profile for users without profile
+                val defaultUser = AppUser(uid = uid, userType = "customer")
+                Result.success(defaultUser)
+            }
         } catch (e: Exception) {
+            println("AuthRepository: Error getting user profile: ${e.message}")
+            e.printStackTrace()
             Result.failure(e)
         }
     }

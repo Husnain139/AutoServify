@@ -20,15 +20,28 @@ class ServicesActivity : AppCompatActivity() {
 
     private lateinit var adapter: ServiceAdapter
     private lateinit var viewModel: ServiceViewModel
+    private var specificShopId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_services)
 
+        // Check if we're viewing services for a specific shop
+        specificShopId = intent.getStringExtra("shop_id")
+        val shopName = intent.getStringExtra("shop_name")
+        
+        // Update title if we're viewing a specific shop
+        if (!specificShopId.isNullOrEmpty() && !shopName.isNullOrEmpty()) {
+            title = "$shopName - Services"
+            println("ServicesActivity: Viewing services for shop: $specificShopId ($shopName)")
+        } else {
+            println("ServicesActivity: Viewing all services")
+        }
+
         val recyclerView = findViewById<RecyclerView>(R.id.services_recyclerview)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        // Initialize adapter immediately with default values
+        // Initialize adapter immediately with default values and click listeners
         adapter = ServiceAdapter(
             items = mutableListOf(),
             onItemClick = { service ->
@@ -36,7 +49,17 @@ class ServicesActivity : AppCompatActivity() {
                 intent.putExtra("data", Gson().toJson(service))
                 startActivity(intent)
             },
-            showEditDeleteButtons = false // Default to customer view
+            showEditDeleteButtons = false, // Default to customer view
+            onEditClick = { service ->
+                // Navigate to edit activity
+                val intent = Intent(this, Add_Service_Activity::class.java)
+                intent.putExtra("serviceData", Gson().toJson(service))
+                startActivity(intent)
+            },
+            onDeleteClick = { service ->
+                // Show delete confirmation dialog
+                showDeleteConfirmationDialog(service)
+            }
         )
         recyclerView.adapter = adapter
 
@@ -69,7 +92,8 @@ class ServicesActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.loadServices()
+        // Load data based on user role
+        loadDataBasedOnUserRole()
 
         // FAB → go to Add Service screen
         // Setup Add button based on user role
@@ -132,5 +156,53 @@ class ServicesActivity : AppCompatActivity() {
             }
             .setNegativeButton("Cancel", null)
             .show()
+    }
+
+    // 🆕 Load data based on user role (role-based access control)
+    private fun loadDataBasedOnUserRole() {
+        lifecycleScope.launch {
+            val authRepository = AuthRepository()
+            val currentUser = authRepository.getCurrentUser()
+            
+            // If a specific shop ID is provided, load services for that shop only
+            if (!specificShopId.isNullOrEmpty()) {
+                println("Loading services for specific shop: $specificShopId")
+                viewModel.loadServicesByShopId(specificShopId!!)
+                return@launch
+            }
+            
+            if (currentUser != null) {
+                val result = authRepository.getUserProfile(currentUser.uid)
+                if (result.isSuccess) {
+                    val userProfile = result.getOrThrow()
+                    when (userProfile.userType) {
+                        "shop_owner" -> {
+                            // Shop owner should only see their own services
+                            val shopId = userProfile.shopId
+                            if (!shopId.isNullOrEmpty()) {
+                                println("Loading services for shop owner's shop: $shopId")
+                                viewModel.loadServicesByShopId(shopId)
+                            } else {
+                                println("Shop owner with no shopId, loading all services")
+                                viewModel.loadServices()
+                            }
+                        }
+                        else -> {
+                            // Customer should see all services from all shops (only when not viewing specific shop)
+                            println("Loading all services for customer")
+                            viewModel.loadServices()
+                        }
+                    }
+                } else {
+                    // Profile not found, load all services
+                    println("Profile not found, loading all services")
+                    viewModel.loadServices()
+                }
+            } else {
+                // No user logged in, load all services
+                println("No user logged in, loading all services")
+                viewModel.loadServices()
+            }
+        }
     }
 }

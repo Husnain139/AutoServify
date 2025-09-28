@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hstan.autoservify.model.repositories.OrderRepository
 import com.hstan.autoservify.model.repositories.AppointmentRepository
-import com.hstan.autoservify.ui.Order
+import com.hstan.autoservify.ui.main.ViewModels.Order
 import com.hstan.autoservify.ui.main.Shops.Services.Appointment
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
@@ -35,6 +35,22 @@ class OrderFragmentViewModel : ViewModel() {
                 .collect { 
                     println("ViewModel: Received ${it.size} orders")
                     orders.value = it 
+                }
+        }
+    }
+
+    // 🆕 Load appointments for a specific shop
+    fun loadShopAppointments(shopId: String) {
+        viewModelScope.launch {
+            println("ViewModel: Loading appointments for shop: $shopId")
+            appointmentRepository.getShopAppointments(shopId)
+                .catch { 
+                    println("ViewModel: Error loading shop appointments: ${it.message}")
+                    failureMessage.value = it.message 
+                }
+                .collect { 
+                    println("ViewModel: Received ${it.size} shop appointments")
+                    appointments.value = it 
                 }
         }
     }

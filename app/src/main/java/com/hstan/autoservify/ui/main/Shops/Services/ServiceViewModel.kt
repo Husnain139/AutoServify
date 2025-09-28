@@ -59,6 +59,18 @@ class ServiceViewModel : ViewModel() {
         }
     }
 
+    // 🆕 Load services for a specific shop (role-based access)
+    fun loadServicesByShopId(shopId: String) {
+        viewModelScope.launch {
+            try {
+                val result = repository.getServicesByShopId(shopId)
+                _services.value = result
+            } catch (e: Exception) {
+                _failureMessage.value = e.message
+            }
+        }
+    }
+
     //  Fetch single service by ID
     fun loadServiceById(serviceId: String) {
         viewModelScope.launch {
