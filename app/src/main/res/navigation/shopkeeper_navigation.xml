@@ -27,7 +27,7 @@
         tools:layout="@layout/fragment_shopkeeper_services" />
     <fragment
         android:id="@+id/item_profile"
-        android:name="com.hstan.autoservify.ui.main.home.ProfileFragment"
+        android:name="com.hstan.autoservify.ui.main.home.Profile.ProfileFragment"
         android:label="profileFragment"
         tools:layout="@layout/fragment_profile" />
 </navigation>

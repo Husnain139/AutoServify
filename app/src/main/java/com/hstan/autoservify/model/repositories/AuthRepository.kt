@@ -104,4 +104,26 @@ class AuthRepository {
             Result.failure(e)
         }
     }
+
+    suspend fun updatePassword(newPassword: String): Result<Boolean> {
+        return try {
+            FirebaseAuth.getInstance().currentUser?.updatePassword(newPassword)?.await()
+            Result.success(true)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun updateProfileImage(uid: String, imageUrl: String): Result<Boolean> {
+        return try {
+            db.collection("users").document(uid)
+                .update("profileImageUrl", imageUrl)
+                .await()
+            Result.success(true)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+
 }

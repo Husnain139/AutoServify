@@ -80,6 +80,7 @@ class ShopActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             startActivity(intent)
         }
 
+
         binding.SparePartsPage.setOnClickListener {
             val intent = Intent(this, PartsCraftActivity::class.java)
             currentShop?.let { shop ->
