@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F7F8FA"
+    android:background="#FEFBFF"
+    android:fillViewport="true"
+    android:clipToPadding="false"
     tools:context=".ui.shopkeeper.ShopkeeperDashboardFragment">
 
     <LinearLayout
@@ -13,11 +15,11 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <!-- Welcome Section -->
+        <!-- Welcome Section - Clean & Minimal -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="32dp"
+            android:layout_marginBottom="28dp"
             android:orientation="vertical">
 
             <!-- Welcome Message -->
@@ -25,8 +27,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Welcome back,"
-                android:textColor="#70747E"
-                android:textSize="18sp"
+                android:textColor="#49454F"
+                android:textSize="16sp"
                 android:fontFamily="sans-serif"
                 android:layout_marginBottom="4dp" />
 
@@ -36,10 +38,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="M Arslan Sarwar"
-                android:textColor="#2B2D33"
+                android:textColor="#1C1B1F"
                 android:textSize="28sp"
                 android:textStyle="bold"
-                android:fontFamily="sans-serif-medium"
+                android:fontFamily="sans-serif"
                 android:layout_marginBottom="8dp" />
 
             <!-- You have text -->
@@ -47,18 +49,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="You have"
-                android:textColor="#70747E"
-                android:textSize="16sp"
+                android:textColor="#49454F"
+                android:textSize="14sp"
                 android:fontFamily="sans-serif" />
 
         </LinearLayout>
 
-        <!-- Statistics Grid -->
+        <!-- Statistics Grid - Clean Material 3 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="32dp">
+            android:layout_marginBottom="28dp"
+            android:baselineAligned="false">
 
             <!-- Left Column -->
             <LinearLayout
@@ -66,32 +69,35 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:layout_marginEnd="8dp">
+                android:layout_marginEnd="10dp">
 
                 <!-- Today's Sales Card -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
-                    android:layout_height="140dp"
-                    android:layout_marginBottom="16dp"
-                    app:cardBackgroundColor="@color/white"
+                    android:layout_height="160dp"
+                    android:layout_marginBottom="12dp"
+                    app:cardBackgroundColor="#FFFFFF"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="2dp"
-                    app:strokeWidth="0dp">
+                    app:strokeWidth="0dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="vertical"
-                        android:padding="20dp"
+                        android:padding="16dp"
                         android:gravity="center">
 
                         <!-- Icon -->
                         <ImageView
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
                             android:src="@drawable/baseline_attach_money_24"
-                            android:layout_marginBottom="12dp"
-                            app:tint="#FF9500" />
+                            android:layout_marginBottom="8dp"
+                            app:tint="#6750A4" />
 
                         <!-- Number -->
                         <TextView
@@ -99,48 +105,54 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="4"
-                            android:textColor="#2B2D33"
-                            android:textSize="36sp"
+                            android:textColor="#1C1B1F"
+                            android:textSize="28sp"
                             android:textStyle="bold"
-                            android:fontFamily="sans-serif-medium"
-                            android:layout_marginBottom="4dp" />
+                            android:fontFamily="sans-serif"
+                            android:layout_marginBottom="6dp" />
 
                         <!-- Label -->
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Today's Sales"
-                            android:textColor="#70747E"
-                            android:textSize="14sp"
-                            android:fontFamily="sans-serif" />
+                            android:textColor="#49454F"
+                            android:textSize="11sp"
+                            android:fontFamily="sans-serif"
+                            android:gravity="center"
+                            android:maxLines="2"
+                            android:ellipsize="end" />
 
                     </LinearLayout>
 
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Appointments Pending Card -->
+                <!-- Appointments Card -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
-                    android:layout_height="140dp"
-                    app:cardBackgroundColor="@color/white"
+                    android:layout_height="160dp"
+                    app:cardBackgroundColor="#FFFFFF"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="2dp"
-                    app:strokeWidth="0dp">
+                    app:strokeWidth="0dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="vertical"
-                        android:padding="20dp"
+                        android:padding="16dp"
                         android:gravity="center">
 
                         <!-- Icon -->
                         <ImageView
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
                             android:src="@drawable/baseline_event_24"
-                            android:layout_marginBottom="12dp"
-                            app:tint="#34C759" />
+                            android:layout_marginBottom="8dp"
+                            app:tint="#6750A4" />
 
                         <!-- Number -->
                         <TextView
@@ -148,20 +160,23 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="7"
-                            android:textColor="#2B2D33"
-                            android:textSize="36sp"
+                            android:textColor="#1C1B1F"
+                            android:textSize="28sp"
                             android:textStyle="bold"
-                            android:fontFamily="sans-serif-medium"
-                            android:layout_marginBottom="4dp" />
+                            android:fontFamily="sans-serif"
+                            android:layout_marginBottom="6dp" />
 
                         <!-- Label -->
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Appointments"
-                            android:textColor="#70747E"
-                            android:textSize="14sp"
-                            android:fontFamily="sans-serif" />
+                            android:textColor="#49454F"
+                            android:textSize="11sp"
+                            android:fontFamily="sans-serif"
+                            android:gravity="center"
+                            android:maxLines="2"
+                            android:ellipsize="end" />
 
                     </LinearLayout>
 
@@ -175,32 +190,35 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="vertical"
-                android:layout_marginStart="8dp">
+                android:layout_marginStart="10dp">
 
-                <!-- Orders Pending Card -->
+                <!-- Orders Card -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
-                    android:layout_height="140dp"
-                    android:layout_marginBottom="16dp"
-                    app:cardBackgroundColor="@color/white"
+                    android:layout_height="160dp"
+                    android:layout_marginBottom="12dp"
+                    app:cardBackgroundColor="#FFFFFF"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="2dp"
-                    app:strokeWidth="0dp">
+                    app:strokeWidth="0dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="vertical"
-                        android:padding="20dp"
+                        android:padding="16dp"
                         android:gravity="center">
 
                         <!-- Icon -->
                         <ImageView
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
                             android:src="@drawable/baseline_shopping_cart_24"
-                            android:layout_marginBottom="12dp"
-                            app:tint="#007AFF" />
+                            android:layout_marginBottom="8dp"
+                            app:tint="#6750A4" />
 
                         <!-- Number -->
                         <TextView
@@ -208,20 +226,23 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="7"
-                            android:textColor="#2B2D33"
-                            android:textSize="36sp"
+                            android:textColor="#1C1B1F"
+                            android:textSize="28sp"
                             android:textStyle="bold"
-                            android:fontFamily="sans-serif-medium"
-                            android:layout_marginBottom="4dp" />
+                            android:fontFamily="sans-serif"
+                            android:layout_marginBottom="6dp" />
 
                         <!-- Label -->
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Orders"
-                            android:textColor="#70747E"
-                            android:textSize="14sp"
-                            android:fontFamily="sans-serif" />
+                            android:textColor="#49454F"
+                            android:textSize="11sp"
+                            android:fontFamily="sans-serif"
+                            android:gravity="center"
+                            android:maxLines="2"
+                            android:ellipsize="end" />
 
                     </LinearLayout>
 
@@ -230,26 +251,29 @@
                 <!-- Reviews Card -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
-                    android:layout_height="140dp"
-                    app:cardBackgroundColor="@color/white"
+                    android:layout_height="160dp"
+                    app:cardBackgroundColor="#FFFFFF"
                     app:cardCornerRadius="16dp"
                     app:cardElevation="2dp"
-                    app:strokeWidth="0dp">
+                    app:strokeWidth="0dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="vertical"
-                        android:padding="20dp"
+                        android:padding="16dp"
                         android:gravity="center">
 
                         <!-- Icon -->
                         <ImageView
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
                             android:src="@drawable/baseline_star_24"
-                            android:layout_marginBottom="12dp"
-                            app:tint="#FFD60A" />
+                            android:layout_marginBottom="8dp"
+                            app:tint="#6750A4" />
 
                         <!-- Number -->
                         <TextView
@@ -257,20 +281,23 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="4.8"
-                            android:textColor="#2B2D33"
-                            android:textSize="36sp"
+                            android:textColor="#1C1B1F"
+                            android:textSize="28sp"
                             android:textStyle="bold"
-                            android:fontFamily="sans-serif-medium"
-                            android:layout_marginBottom="4dp" />
+                            android:fontFamily="sans-serif"
+                            android:layout_marginBottom="6dp" />
 
                         <!-- Label -->
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Reviews"
-                            android:textColor="#70747E"
-                            android:textSize="14sp"
-                            android:fontFamily="sans-serif" />
+                            android:textColor="#49454F"
+                            android:textSize="11sp"
+                            android:fontFamily="sans-serif"
+                            android:gravity="center"
+                            android:maxLines="2"
+                            android:ellipsize="end" />
 
                     </LinearLayout>
 
@@ -280,15 +307,18 @@
 
         </LinearLayout>
 
-        <!-- Shop Info Card -->
+        <!-- Shop Info Card - Clean Design -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
-            app:strokeWidth="0dp">
+            android:layout_marginBottom="28dp"
+            app:cardBackgroundColor="#FFFFFF"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="3dp"
+            app:strokeWidth="0dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -300,13 +330,13 @@
                 <!-- Shop Image Circle -->
                 <ImageView
                     android:id="@+id/shop_image"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
                     android:background="@drawable/circle_background"
                     android:contentDescription="Shop Image"
-                    android:padding="12dp"
+                    android:padding="14dp"
                     android:src="@drawable/baseline_store_24"
-                    app:tint="@color/design_default_color_primary" />
+                    app:tint="#6750A4" />
 
                 <!-- Shop Info -->
                 <LinearLayout
@@ -321,10 +351,10 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="My Auto Shop"
-                        android:textColor="#2B2D33"
+                        android:textColor="#1C1B1F"
                         android:textSize="18sp"
                         android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium" />
+                        android:fontFamily="sans-serif" />
 
                     <TextView
                         android:id="@+id/shop_location_text"
@@ -332,7 +362,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:text="Lahore, Pakistan"
-                        android:textColor="#70747E"
+                        android:textColor="#49454F"
                         android:textSize="14sp"
                         android:fontFamily="sans-serif" />
 
@@ -347,8 +377,9 @@
                     android:minWidth="80dp"
                     android:text="Edit"
                     android:textSize="14sp"
-                    android:textColor="@color/design_default_color_primary"
-                    app:strokeColor="@color/design_default_color_primary"
+                    android:textColor="#6750A4"
+                    android:fontFamily="sans-serif"
+                    app:strokeColor="#6750A4"
                     app:cornerRadius="20dp" />
 
             </LinearLayout>
@@ -360,7 +391,7 @@
             android:id="@+id/recent_orders_section"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="20dp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -375,19 +406,23 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Recent Orders"
-                    android:textColor="@color/black"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:textColor="#1C1B1F"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif" />
 
                 <TextView
                     android:id="@+id/view_all_orders_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="?attr/selectableItemBackground"
-                    android:padding="8dp"
+                    android:padding="12dp"
                     android:text="View all"
-                    android:textColor="@color/design_default_color_primary"
-                    android:textSize="14sp" />
+                    android:textColor="#6750A4"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif"
+                    android:minHeight="48dp"
+                    android:gravity="center" />
 
             </LinearLayout>
 
@@ -396,6 +431,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:clipToPadding="false"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
                 tools:listitem="@layout/item_order" />
 
         </LinearLayout>
@@ -405,7 +443,7 @@
             android:id="@+id/recent_appointments_section"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="20dp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -420,19 +458,23 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Recent Appointments"
-                    android:textColor="@color/black"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:textColor="#1C1B1F"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif" />
 
                 <TextView
                     android:id="@+id/view_all_appointments_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="?attr/selectableItemBackground"
-                    android:padding="8dp"
+                    android:padding="12dp"
                     android:text="View all"
-                    android:textColor="@color/design_default_color_primary"
-                    android:textSize="14sp" />
+                    android:textColor="#6750A4"
+                    android:textSize="14sp"
+                    android:fontFamily="sans-serif"
+                    android:minHeight="48dp"
+                    android:gravity="center" />
 
             </LinearLayout>
 
@@ -441,6 +483,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:clipToPadding="false"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
                 tools:listitem="@layout/item_order" />
 
         </LinearLayout>

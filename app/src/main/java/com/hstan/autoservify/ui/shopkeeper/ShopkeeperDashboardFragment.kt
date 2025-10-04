@@ -6,6 +6,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
+import android.view.animation.DecelerateInterpolator
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -31,6 +33,10 @@ class ShopkeeperDashboardFragment : Fragment() {
     lateinit var binding: FragmentShopkeeperDashboardBinding
     
     private var currentShop: Shop? = null
+    
+    // Data loading state management
+    private var isDataLoaded = false
+    private var isDataLoading = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -57,8 +63,15 @@ class ShopkeeperDashboardFragment : Fragment() {
         // Setup click listeners
         setupClickListeners()
 
-        // Load shopkeeper data
-        loadShopkeeperData()
+        // Load shopkeeper data only if not already loaded or loading
+        if (!isDataLoaded && !isDataLoading) {
+            // Show loading state immediately
+            showLoadingState()
+            loadShopkeeperData()
+        } else if (isDataLoaded) {
+            // Data is already loaded, show it immediately without animation delay
+            showLoadedState()
+        }
     }
 
     private fun setupClickListeners() {
@@ -81,27 +94,118 @@ class ShopkeeperDashboardFragment : Fragment() {
         }
     }
 
+    private fun setupMaterial3Animations() {
+        // Simple, clean fade-in animation
+        binding.root.alpha = 0f
+        binding.root.animate()
+            .alpha(1f)
+            .setDuration(200)
+            .setInterpolator(DecelerateInterpolator())
+            .start()
+    }
+
+    private fun showLoadingState() {
+        // Hide content while loading to prevent flash of old data
+        binding.root.alpha = 0.3f
+        
+        // Set loading placeholders
+        binding.shopkeeperNameText.text = "Loading..."
+        binding.shopNameText.text = "Loading shop info..."
+        binding.shopLocationText.text = ""
+        
+        // Set loading stats
+        binding.salesCount.text = "--"
+        binding.ordersPendingCount.text = "--"
+        binding.appointmentsPendingCount.text = "--"
+        binding.averageReview.text = "--"
+    }
+
+    private fun showLoadedState() {
+        // Show content with smooth animation
+        binding.root.animate()
+            .alpha(1f)
+            .setDuration(150)
+            .setInterpolator(DecelerateInterpolator())
+            .start()
+    }
+
     private fun loadShopkeeperData() {
+        if (isDataLoading) return // Prevent multiple simultaneous loads
+        
+        isDataLoading = true
         lifecycleScope.launch {
-            val authRepository = AuthRepository()
-            val currentUser = authRepository.getCurrentUser()
-            
-            if (currentUser != null) {
-                val result = authRepository.getUserProfile(currentUser.uid)
-                if (result.isSuccess) {
-                    val userProfile = result.getOrThrow()
-                    // Update shopkeeper name
-                    updateShopkeeperName(userProfile.name ?: userProfile.email ?: "Shopkeeper")
-                    
-                    if (userProfile.userType == "shop_owner") {
-                        userProfile.shopId?.let { shopId ->
-                            loadShopData(shopId)
-                            loadDashboardStats(shopId)
-                            loadRecentOrders(shopId)
-                            loadRecentAppointments(shopId)
+            try {
+                val authRepository = AuthRepository()
+                val currentUser = authRepository.getCurrentUser()
+                
+                if (currentUser != null) {
+                    val result = authRepository.getUserProfile(currentUser.uid)
+                    if (result.isSuccess) {
+                        val userProfile = result.getOrThrow()
+                        // Update shopkeeper name
+                        updateShopkeeperName(userProfile.name ?: userProfile.email ?: "Shopkeeper")
+                        
+                        if (userProfile.userType == "shop_owner") {
+                            userProfile.shopId?.let { shopId ->
+                                // Load all data concurrently but wait for completion
+                                loadShopData(shopId)
+                                loadDashboardStats(shopId)
+                                loadRecentOrders(shopId)
+                                loadRecentAppointments(shopId)
+                                
+                                // Mark as loaded and show content
+                                isDataLoaded = true
+                                showLoadedState()
+                            } ?: run {
+                                println("ShopkeeperDashboard: ERROR - User has no shopId!")
+                                showLoadedState() // Show even with error
+                            }
+                        } else {
+                            println("ShopkeeperDashboard: ERROR - User is not a shop_owner, type: ${userProfile.userType}")
+                            showLoadedState() // Show even with error
                         }
                     }
                 }
+            } catch (e: Exception) {
+                println("ShopkeeperDashboard: Error loading data: ${e.message}")
+                showLoadedState() // Show even with error
+            } finally {
+                isDataLoading = false
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Refresh data when returning from other fragments, but only if data was previously loaded
+        if (isDataLoaded && !isDataLoading) {
+            // Refresh data silently without showing loading state
+            refreshDashboardData()
+        }
+    }
+
+    private fun refreshDashboardData() {
+        lifecycleScope.launch {
+            try {
+                val authRepository = AuthRepository()
+                val currentUser = authRepository.getCurrentUser()
+                
+                if (currentUser != null) {
+                    val result = authRepository.getUserProfile(currentUser.uid)
+                    if (result.isSuccess) {
+                        val userProfile = result.getOrThrow()
+                        if (userProfile.userType == "shop_owner") {
+                            userProfile.shopId?.let { shopId ->
+                                // Refresh data without showing loading state
+                                loadDashboardStats(shopId)
+                                loadRecentOrders(shopId)
+                                loadRecentAppointments(shopId)
+                            }
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                println("ShopkeeperDashboard: Error refreshing data: ${e.message}")
             }
         }
     }
@@ -160,16 +264,17 @@ class ShopkeeperDashboardFragment : Fragment() {
                 
                 // Load appointments and calculate statistics
                 appointmentRepository.getShopAppointments(shopId).collect { appointments ->
-                    // Total appointments for this shop
-                    val totalAppointments = appointments.size
-                    
-                    // Debug logging
-                    println("ShopkeeperDashboard: Total appointments for shop $shopId: $totalAppointments")
-                    appointments.forEach { appointment ->
-                        println("ShopkeeperDashboard: Appointment - Service: ${appointment.serviceName}, Status: ${appointment.status}, ShopId: ${appointment.shopId}")
+                    // Filter appointments that actually match our shopId (in case of data inconsistencies)
+                    // Also handle null/empty shopId values from old data
+                    val validAppointments = appointments.filter { appointment ->
+                        val appointmentShopId = appointment.shopId?.trim() ?: ""
+                        val currentShopId = shopId.trim()
+                        appointmentShopId.isNotEmpty() && appointmentShopId == currentShopId
                     }
                     
-                    // Update UI with total appointments
+                    val totalAppointments = validAppointments.size
+                    
+                    // Update UI with filtered appointments count
                     binding.appointmentsPendingCount.text = totalAppointments.toString()
                 }
                 
@@ -205,5 +310,12 @@ class ShopkeeperDashboardFragment : Fragment() {
                 dashboardAppointmentAdapter.updateData(appointments)
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        // Reset loading states when view is destroyed
+        isDataLoaded = false
+        isDataLoading = false
     }
 }

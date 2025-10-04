@@ -1,9 +1,11 @@
 package com.hstan.autoservify.ui.orders
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.gson.Gson
 import com.hstan.autoservify.R
 import com.hstan.autoservify.databinding.ItemOrderBinding
 import com.hstan.autoservify.ui.main.ViewModels.Order
@@ -42,9 +44,25 @@ class OrderAdapter(
             .error(R.drawable.logo)
             .into(holder.binding.orderItemImage)
 
-        holder.binding.orderView.setOnClickListener { onViewClick?.invoke(order) }
+        holder.binding.orderView.setOnClickListener { 
+            onViewClick?.invoke(order)
+            
+            // Navigate to OrderDetailActivity
+            val context = holder.itemView.context
+            val intent = Intent(context, OrderDetailActivity::class.java)
+            intent.putExtra("order_data", Gson().toJson(order))
+            context.startActivity(intent)
+        }
         holder.binding.orderCancel.setOnClickListener { onCancelClick?.invoke(order) }
-        holder.itemView.setOnClickListener { onViewClick?.invoke(order) }
+        holder.itemView.setOnClickListener { 
+            onViewClick?.invoke(order)
+            
+            // Navigate to OrderDetailActivity
+            val context = holder.itemView.context
+            val intent = Intent(context, OrderDetailActivity::class.java)
+            intent.putExtra("order_data", Gson().toJson(order))
+            context.startActivity(intent)
+        }
     }
 
     private fun bindAppointment(holder: OrderViewHolder, appointment: Appointment) {

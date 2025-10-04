@@ -19,6 +19,9 @@
             android:exported="false" />
         <activity
             android:name=".ui.orders.CreateOrderActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.orders.OrderDetailActivity"
             android:exported="false" /> <!-- Shops -->
         <activity
             android:name=".ui.main.Shops.AddShopActivity"

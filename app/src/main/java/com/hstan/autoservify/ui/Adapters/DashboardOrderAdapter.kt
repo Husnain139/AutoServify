@@ -1,11 +1,14 @@
 package com.hstan.autoservify.ui.Adapters
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
 import com.hstan.autoservify.databinding.ItemOrderBinding
 import com.hstan.autoservify.ui.main.ViewModels.Order
+import com.hstan.autoservify.ui.orders.OrderDetailActivity
 
 class DashboardOrderAdapter(
     private var items: List<Order>,
@@ -35,6 +38,12 @@ class DashboardOrderAdapter(
         // Set click listener
         holder.itemView.setOnClickListener {
             onItemClick(order)
+            
+            // Navigate to OrderDetailActivity
+            val context = holder.itemView.context
+            val intent = Intent(context, OrderDetailActivity::class.java)
+            intent.putExtra("order_data", Gson().toJson(order))
+            context.startActivity(intent)
         }
     }
 
